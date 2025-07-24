@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptBridge - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="main-header">
+        <h2>PromptBridge</h2>
+        <button id="logoutButton" class="logout-button">Logout</button>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Your Prompts</h1>
+            <div id="prompt-list">
+                </div>
+            <hr>
+            <h2>Create New Prompt</h2>
+            <form id="createPromptForm">
+                <input type="text" id="promptTitle" placeholder="Prompt Title" required>
+                <textarea id="promptDescription" placeholder="Description"></textarea>
+                <textarea id="promptContent" placeholder="Enter your prompt content here..." required></textarea>
+                <button type="submit">Create Prompt</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

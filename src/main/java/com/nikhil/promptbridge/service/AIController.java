@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/api/ai")
 public class AIController {
@@ -30,7 +28,7 @@ public class AIController {
         try {
             String enhancedContent = aiService.getEnhancedPrompt(version.getContent());
             return ResponseEntity.ok(enhancedContent);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error communicating with AI service.");
         }

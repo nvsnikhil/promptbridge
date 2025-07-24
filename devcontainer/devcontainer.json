@@ -1,11 +1,11 @@
 {
-  "name": "Java 21 with MySQL",
-  "image": "mcr.microsoft.com/devcontainers/java:21",
-  "containerEnv": {
-    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
-    "PATH": "/usr/lib/jvm/java-21-openjdk-amd64/bin:${PATH}"
-  },
+  "name": "Java 21 & MySQL",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installMaven": true
+    },
     "ghcr.io/devcontainers/features/mysql:1": {
       "version": "latest",
       "database": "promptbridge_db",
@@ -13,17 +13,21 @@
       "password": "root"
     }
   },
+  "forwardPorts": [8080, 3306],
+  "containerEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "PATH": "/usr/lib/jvm/java-21-openjdk-amd64/bin:${PATH}"
+  },
+  "postCreateCommand": "mvn clean install",
   "customizations": {
     "vscode": {
-      "settings": {
-        "java.home": "/usr/lib/jvm/java-21-openjdk-amd64"
-      },
       "extensions": [
         "vscjava.vscode-java-pack",
         "pivotal.vscode-spring-boot"
-      ]
+      ],
+      "settings": {
+        "java.home": "/usr/lib/jvm/java-21-openjdk-amd64"
+      }
     }
-  },
-  "forwardPorts": [8080, 3306],
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y openjdk-21-jdk && sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java && mvn clean install"
+  }
 }

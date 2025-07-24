@@ -1,29 +1,29 @@
 {
-    "name": "Java 21 with MySQL",
-    "image": "mcr.microsoft.com/devcontainers/java:21",
-    "containerEnv": {
-        "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
-        "PATH": "/usr/lib/jvm/java-21-openjdk-amd64/bin:${PATH}"
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/mysql:1": {
-            "version": "latest",
-            "database": "promptbridge_db",
-            "user": "root",
-            "password": "root"
-        }
-    },
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "java.home": "/usr/lib/jvm/java-21-openjdk-amd64"
-            },
-            "extensions": [
-                "vscjava.vscode-java-pack",
-                "pivotal.vscode-spring-boot"
-            ]
-        }
-    },
-    "forwardPorts": [8080, 3306],
-    "postCreateCommand": "mvn clean install"
+  "name": "Java 21 with MySQL",
+  "image": "mcr.microsoft.com/devcontainers/java:21",
+  "containerEnv": {
+    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
+    "PATH": "/usr/lib/jvm/java-21-openjdk-amd64/bin:${PATH}"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/mysql:1": {
+      "version": "latest",
+      "database": "promptbridge_db",
+      "user": "root",
+      "password": "root"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.home": "/usr/lib/jvm/java-21-openjdk-amd64"
+      },
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "pivotal.vscode-spring-boot"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 3306],
+  "postCreateCommand": "mvn clean install"
 }

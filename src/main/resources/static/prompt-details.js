@@ -36,9 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     `).join('');
 
                     return `
-                        <div class="prompt-version">
+                        <div class="prompt-version" id="version-container-${version.id}">
                             <h4>Version ${version.versionNumber}</h4>
                             <pre>${version.content}</pre>
+                            <button class="enhance-button" data-version-id="${version.id}">Enhance with AI</button>
+                            <div class="ai-suggestion-container"></div>
                             <div class="feedback-section">
                                 <h5>Feedback</h5>
                                 ${feedbackHtml.length > 0 ? feedbackHtml : '<p>No feedback yet.</p>'}
@@ -59,17 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3>Versions</h3>
                 ${versionsHtml}
             `;
-            attachFeedbackFormListeners();
+            attachAllEventListeners();
         })
         .catch(error => console.error('Error fetching details:', error));
     }
 
-    function attachFeedbackFormListeners() {
+    function attachAllEventListeners() {
+        // --- Event Listener for Feedback Forms ---
         document.querySelectorAll('.feedback-form').forEach(form => {
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 const button = form.querySelector('button');
-                button.classList.add('loading'); // Start loading
+                button.classList.add('loading');
 
                 const versionId = form.dataset.versionId;
                 const feedbackData = {
@@ -85,19 +88,49 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!response.ok) throw new Error('Failed to submit feedback');
                     fetchAndRenderPrompt();
                 })
-                .catch(error => console.error('Error submitting feedback:', error))
+                .catch(error => {
+                    console.error('Error submitting feedback:', error);
+                    button.classList.remove('loading');
+                });
+            });
+        });
+
+        // --- Event Listener for AI Enhance Buttons ---
+        document.querySelectorAll('.enhance-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                const versionId = event.target.dataset.versionId;
+                const suggestionContainer = document.querySelector(`#version-container-${versionId} .ai-suggestion-container`);
+                
+                button.classList.add('loading');
+                suggestionContainer.innerHTML = '';
+
+                fetch(`/api/ai/enhance/${versionId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('AI enhancement failed');
+                    return response.text();
+                })
+                .then(suggestion => {
+                    suggestionContainer.innerHTML = `<div class="ai-suggestion">${suggestion.replace(/\\n/g, '<br>')}</div>`;
+                })
+                .catch(error => {
+                    console.error('Error enhancing prompt:', error);
+                    suggestionContainer.innerHTML = '<p style="color:red;">Error getting AI suggestion.</p>';
+                })
                 .finally(() => {
-                    // This will run regardless of success or error
-                    // We don't need to explicitly remove the class here because the page re-renders
+                    button.classList.remove('loading');
                 });
             });
         });
     }
 
+    // --- Event Listener for Add New Version Form ---
     addVersionForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const button = addVersionForm.querySelector('button');
-        button.classList.add('loading'); // Start loading
+        button.classList.add('loading');
 
         const versionData = { content: document.getElementById('newVersionContent').value };
         fetch(`/prompts/${promptId}/versions`, {
@@ -112,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error adding version:', error))
         .finally(() => {
-            button.classList.remove('loading'); // Stop loading
+            button.classList.remove('loading');
         });
     });
 

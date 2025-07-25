@@ -35,11 +35,12 @@ public class AIService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body().string(); // Read the body once
+
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response + " Body: " + response.body().string());
+                // This is the improved error handling
+                throw new IOException("Unexpected code " + response + " | Body: " + responseBody);
             }
-            
-            String responseBody = response.body().string();
             
             // Use Jackson ObjectMapper for robust JSON parsing
             JsonNode root = objectMapper.readTree(responseBody);

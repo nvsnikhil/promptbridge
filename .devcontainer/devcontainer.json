@@ -1,13 +1,12 @@
 {
-  "name": "Java 21 & MySQL",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
-      "installMaven": true
-    }
-    // No MySQL feature block!
-  },
-  "forwardPorts": [8080, 3306],
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y mysql-server && sudo service mysql start && mvn clean install"
+    "name": "Java 21 & MySQL",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "21",
+            "installMaven": true
+        }
+    },
+    "forwardPorts": [8080, 3306],
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y mysql-server && sudo service mysql start && sleep 5 && mysql -u root -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY 'root'; CREATE DATABASE IF NOT EXISTS promptbridge_db;\" && mvn clean install"
 }

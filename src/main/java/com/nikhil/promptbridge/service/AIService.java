@@ -1,13 +1,12 @@
 package com.nikhil.promptbridge.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 @Service
 public class AIService {
@@ -15,34 +14,41 @@ public class AIService {
     @Value("${huggingface.api.key}")
     private String apiKey;
 
-    // A popular and powerful open-source model for text generation
     private final String modelUrl = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+    private final OkHttpClient client = new OkHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String getEnhancedPrompt(String originalPrompt) throws IOException, InterruptedException {
+    public String getEnhancedPrompt(String originalPrompt) throws IOException {
         
         String instruction = "Critique the following user-submitted prompt and suggest a more effective version. "
             + "Provide a brief explanation of why your version is better. "
-            + "The user's prompt is: \"" + originalPrompt + "\"";
+            + "The user's prompt is: \"" + originalPrompt.replace("\"", "\\\"") + "\"";
 
-        // Create a JSON payload for the API request
-        String jsonPayload = "{\"inputs\":\"" + instruction.replace("\"", "\\\"") + "\"}";
+        String jsonPayload = "{\"inputs\":\"" + instruction + "\"}";
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(modelUrl))
-                .header("Authorization", "Bearer " + apiKey)
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+        RequestBody body = RequestBody.create(jsonPayload, MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder()
+                .url(modelUrl)
+                .addHeader("Authorization", "Bearer " + apiKey)
+                .post(body)
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Basic parsing to extract the generated text from the JSON response
-        String responseBody = response.body();
-        if (responseBody.contains("\"generated_text\":\"")) {
-             return responseBody.split("\"generated_text\":\"")[1].split("\"")[0];
-        } else {
-            return "Error: Could not parse AI response. Full response: " + responseBody;
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+            
+            String responseBody = response.body().string();
+            
+            // Use Jackson ObjectMapper for robust JSON parsing
+            JsonNode root = objectMapper.readTree(responseBody);
+            if (root.isArray() && root.size() > 0 && root.get(0).has("generated_text")) {
+                String generatedText = root.get(0).get("generated_text").asText();
+                // Clean up the response by removing the original instruction
+                return generatedText.replace(instruction, "").trim();
+            } else {
+                return "Error: Could not parse AI response. Full response: " + responseBody;
+            }
         }
     }
 }

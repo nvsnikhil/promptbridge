@@ -14,7 +14,8 @@ public class AIService {
     @Value("${huggingface.api.key}")
     private String apiKey;
 
-    private final String modelUrl = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2";
+    // Switched to a reliable, always-available model on the free tier
+    private final String modelUrl = "https://api-inference.huggingface.co/models/distilgpt2";
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,7 +36,7 @@ public class AIService {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
+                throw new IOException("Unexpected code " + response + " Body: " + response.body().string());
             }
             
             String responseBody = response.body().string();

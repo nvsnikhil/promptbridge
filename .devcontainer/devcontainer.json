@@ -1,4 +1,13 @@
 {
-	"name": "Java",
-	"image": "mcr.microsoft.com/devcontainers/java:21"
+    "name": "Java & MySQL",
+    "image": "mcr.microsoft.com/devcontainers/java:21",
+    "features": {
+        "ghcr.io/devcontainers/features/mysql:1": {
+            "version": "latest",
+            "database": "promptbridge_db",
+            "user": "root",
+            "password": "root"
+        }
+    },
+    "forwardPorts": [8080, 3306]
 }

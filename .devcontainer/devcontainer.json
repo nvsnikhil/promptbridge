@@ -1,25 +1,13 @@
 {
-    "name": "Java 21 & MySQL",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/features/java:1": {
-            "version": "21",
-            "installMaven": true
-        },
-        "ghcr.io/devcontainers/features/mysql:1": {
-            "version": "latest",
-            "database": "promptbridge_db",
-            "user": "root",
-            "password": "root"
-        }
-    },
-    "forwardPorts": [8080, 3306],
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "vscjava.vscode-java-pack",
-                "pivotal.vscode-spring-boot"
-            ]
-        }
+  "name": "Java 21 & MySQL",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "21",
+      "installMaven": true
     }
+    // No MySQL feature block!
+  },
+  "forwardPorts": [8080, 3306],
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y mysql-server && sudo service mysql start && mvn clean install"
 }

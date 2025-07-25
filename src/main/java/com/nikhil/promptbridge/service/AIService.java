@@ -14,8 +14,8 @@ public class AIService {
     @Value("${huggingface.api.key}")
     private String apiKey;
 
-    // Switched to a reliable, always-available model on the free tier
-    private final String modelUrl = "https://api-inference.huggingface.co/models/distilgpt2";
+    // Switched to the classic, ultra-reliable gpt2 model
+    private final String modelUrl = "https://api-inference.huggingface.co/models/gpt2";
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 

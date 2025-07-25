@@ -1,33 +1,13 @@
 {
-  "name": "Java 21 & MySQL",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
-      "installMaven": true
+    "name": "Java & MySQL",
+    "image": "mcr.microsoft.com/devcontainers/java:21",
+    "features": {
+        "ghcr.io/devcontainers/features/mysql:1": {
+            "version": "latest",
+            "database": "promptbridge_db",
+            "user": "root",
+            "password": "root"
+        }
     },
-    "ghcr.io/devcontainers/features/mysql:1": {
-      "version": "latest",
-      "database": "promptbridge_db",
-      "user": "root",
-      "password": "root"
-    }
-  },
-  "forwardPorts": [8080, 3306],
-  "containerEnv": {
-    "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk-amd64",
-    "PATH": "/usr/lib/jvm/java-21-openjdk-amd64/bin:${PATH}"
-  },
-  "postCreateCommand": "mvn clean install",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "vscjava.vscode-java-pack",
-        "pivotal.vscode-spring-boot"
-      ],
-      "settings": {
-        "java.home": "/usr/lib/jvm/java-21-openjdk-amd64"
-      }
-    }
-  }
+    "forwardPorts": [8080, 3306]
 }

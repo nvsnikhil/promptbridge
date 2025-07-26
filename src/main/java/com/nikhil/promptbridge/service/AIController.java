@@ -30,7 +30,7 @@ public class AIController {
             return ResponseEntity.ok(enhancedContent);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error communicating with AI service.");
+            return ResponseEntity.status(500).body("Error communicating with AI service: " + e.getMessage());
         }
     }
 }

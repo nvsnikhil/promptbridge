@@ -1,6 +1,7 @@
 package com.nikhil.promptbridge.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp; // Import for CreationTimestamp
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,13 +14,14 @@ public class PromptVersion {
     private Long id;
 
     @Lob 
-    @Column(columnDefinition = "TEXT") // This is the fix to allow long prompts
+    @Column(columnDefinition = "TEXT") // Ensures MySQL uses the correct type for long text
     private String content;
 
     @Column(name = "version_number")
     private int versionNumber;
 
-    @Column(name = "created_at")
+    @CreationTimestamp // Automatically sets the timestamp when a new version is created
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

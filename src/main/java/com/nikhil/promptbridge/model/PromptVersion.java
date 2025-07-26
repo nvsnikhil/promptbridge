@@ -1,8 +1,9 @@
 package com.nikhil.promptbridge.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp; // Import for CreationTimestamp
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,13 +15,13 @@ public class PromptVersion {
     private Long id;
 
     @Lob 
-    @Column(columnDefinition = "TEXT") // Ensures MySQL uses the correct type for long text
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "version_number")
     private int versionNumber;
 
-    @CreationTimestamp // Automatically sets the timestamp when a new version is created
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -29,7 +30,7 @@ public class PromptVersion {
     private Prompt prompt;
     
     @OneToMany(mappedBy = "promptVersion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Feedback> feedback;
+    private List<Feedback> feedback = new ArrayList<>(); // Initialized list
 
     // --- Getters and Setters ---
     

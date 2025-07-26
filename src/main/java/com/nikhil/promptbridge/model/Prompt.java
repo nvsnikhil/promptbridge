@@ -1,6 +1,7 @@
 package com.nikhil.promptbridge.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp; // Import for CreationTimestamp
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,8 @@ public class Prompt {
     private String title;
     private String description;
 
-    @Column(name = "created_at")
+    @CreationTimestamp // Automatically sets the timestamp when a new prompt is created
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +26,7 @@ public class Prompt {
     private User user;
 
     @OneToMany(mappedBy = "prompt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<PromptVersion> versions = new ArrayList<>();
+    private List<PromptVersion> versions = new ArrayList<>(); // Initialized list
 
     // --- Getters and Setters ---
     

@@ -1,10 +1,13 @@
 package com.nikhil.promptbridge.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // Import for JsonIgnore
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,15 +20,20 @@ public class User implements UserDetails {
     private Long id;
 
     private String name;
+
+    @Column(nullable = false, unique = true) // Ensures email is always present and unique
     private String email;
+
+    @JsonIgnore // Prevents the password hash from being included in JSON responses
     private String passwordHash;
 
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
     
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Prompt> prompts;
-    
+    private List<Prompt> prompts = new ArrayList<>();
+
     // --- Getters, Setters, and UserDetails Methods ---
     
     @Override

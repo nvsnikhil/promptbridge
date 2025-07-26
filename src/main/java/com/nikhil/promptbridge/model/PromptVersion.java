@@ -13,6 +13,7 @@ public class PromptVersion {
     private Long id;
 
     @Lob 
+    @Column(columnDefinition = "TEXT") // This is the fix to allow long prompts
     private String content;
 
     @Column(name = "version_number")

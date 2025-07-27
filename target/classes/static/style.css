@@ -118,11 +118,38 @@ button {
     text-decoration: none;
     color: inherit;
     transition: all 0.2s ease-in-out;
+    position: relative;
 }
+
 .prompt-item:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
+
+.delete-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.prompt-item:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
 .prompt-version {
     background-color: #f9f9f9;
     border: 1px solid #eee;
@@ -168,10 +195,10 @@ button.loading::after {
 
 /* --- AI Enhancement Styles --- */
 .enhance-button {
-    background-color: #2ecc71; /* A distinct green color */
+    background-color: #2ecc71;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    width: auto; /* Let the button size to its content */
+    width: auto;
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     font-weight: bold;
@@ -184,8 +211,8 @@ button.loading::after {
 .ai-suggestion {
     margin-top: 1rem;
     padding: 1rem;
-    background-color: #e8f6fd; /* A light blue background */
+    background-color: #e8f6fd;
     border: 1px solid #bce8f1;
     border-radius: 4px;
-    white-space: pre-wrap; /* Ensures the AI response wraps correctly */
+    white-space: pre-wrap;
 }

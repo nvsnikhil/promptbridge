@@ -20,6 +20,11 @@ class AddVersionRequest {
     public String content;
 }
 
+// DTO for the edit request
+class UpdateVersionRequest {
+    public String content;
+}
+
 @RestController
 @RequestMapping("/prompts")
 public class PromptController {
@@ -77,9 +82,21 @@ public class PromptController {
     public ResponseEntity<Void> deletePrompt(@PathVariable Long id, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        
         promptService.deletePrompt(id, currentUser);
-        
         return ResponseEntity.noContent().build();
+    }
+
+    // This is the new endpoint for editing a prompt version
+    @PutMapping("/versions/{versionId}")
+    public ResponseEntity<Void> updateVersion(
+            @PathVariable Long versionId,
+            @RequestBody UpdateVersionRequest request,
+            Authentication authentication) {
+        String userEmail = authentication.getName();
+        User currentUser = promptService.getCurrentUser(userEmail);
+        
+        promptService.updatePromptVersion(versionId, request.content, currentUser);
+        
+        return ResponseEntity.ok().build();
     }
 }

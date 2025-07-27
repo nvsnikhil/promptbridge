@@ -8,6 +8,7 @@ import com.nikhil.promptbridge.model.Prompt;
 import com.nikhil.promptbridge.model.PromptVersion;
 import com.nikhil.promptbridge.model.User;
 import com.nikhil.promptbridge.repository.PromptRepository;
+import com.nikhil.promptbridge.repository.PromptVersionRepository;
 import com.nikhil.promptbridge.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,13 @@ public class PromptService {
 
     private final PromptRepository promptRepository;
     private final UserRepository userRepository;
+    private final PromptVersionRepository promptVersionRepository;
 
     @Autowired
-    public PromptService(PromptRepository promptRepository, UserRepository userRepository) {
+    public PromptService(PromptRepository promptRepository, UserRepository userRepository, PromptVersionRepository promptVersionRepository) {
         this.promptRepository = promptRepository;
         this.userRepository = userRepository;
+        this.promptVersionRepository = promptVersionRepository;
     }
 
     @Transactional
@@ -76,7 +79,6 @@ public class PromptService {
         return promptRepository.save(prompt);
     }
 
-    // This is the new, more secure method for deleting a prompt
     @Transactional
     public void deletePrompt(Long promptId, User currentUser) {
         Prompt promptToDelete = promptRepository.findById(promptId)
@@ -88,6 +90,20 @@ public class PromptService {
         }
         
         promptRepository.delete(promptToDelete);
+    }
+
+    @Transactional
+    public PromptVersion updatePromptVersion(Long versionId, String newContent, User currentUser) {
+        PromptVersion versionToUpdate = promptVersionRepository.findById(versionId)
+                .orElseThrow(() -> new EntityNotFoundException("Prompt version not found with id: " + versionId));
+
+        // Security Check: Ensure the user owns the parent prompt of this version
+        if (!Objects.equals(versionToUpdate.getPrompt().getUser().getId(), currentUser.getId())) {
+            throw new AccessDeniedException("You do not have permission to edit this prompt version.");
+        }
+
+        versionToUpdate.setContent(newContent);
+        return promptVersionRepository.save(versionToUpdate);
     }
     
     public PromptDetailsDto convertToDto(Prompt prompt) {

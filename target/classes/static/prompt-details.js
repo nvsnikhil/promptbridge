@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('jwtToken');
     const container = document.getElementById('prompt-details-container');
     const addVersionForm = document.getElementById('addVersionForm');
+    const newVersionTextarea = document.getElementById('newVersionContent');
 
     if (!token) {
         window.location.href = 'index.html';
@@ -50,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `).join('');
 
-                    // This now includes BOTH the Edit and Enhance buttons
                     return `
                         <div class="prompt-version" id="version-container-${version.id}">
                             <button class="edit-button" data-version-id="${version.id}">Edit</button>
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    // This single event listener now handles Edit, Cancel, Save, and Enhance clicks
+    // This single event listener now handles all clicks
     document.body.addEventListener('click', function(event) {
         const target = event.target;
 
@@ -161,13 +161,25 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(handleResponse)
             .then(suggestion => {
-                suggestionContainer.innerHTML = `<div class="ai-suggestion">${suggestion.replace(/\\n/g, '<br>')}</div>`;
+                suggestionContainer.innerHTML = `
+                    <div class="ai-suggestion">
+                        <pre class="suggestion-text">${escapeHtml(suggestion)}</pre>
+                        <button class="apply-suggestion-button">Create New Version from this Suggestion</button>
+                    </div>`;
             })
             .catch(error => {
                 console.error('Error enhancing prompt:', error);
                 suggestionContainer.innerHTML = `<p style="color:red;">Error getting AI suggestion: ${error.message}</p>`;
             })
             .finally(() => button.classList.remove('loading'));
+        }
+
+        // --- Apply AI Suggestion Button Logic ---
+        if (target && target.matches('.apply-suggestion-button')) {
+            const suggestionText = target.parentElement.querySelector('.suggestion-text').textContent;
+            newVersionTextarea.value = suggestionText;
+            addVersionForm.scrollIntoView({ behavior: 'smooth' });
+            newVersionTextarea.focus();
         }
     });
 

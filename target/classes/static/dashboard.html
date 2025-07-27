@@ -15,8 +15,17 @@
     <main>
         <div class="container">
             <h1>Your Prompts</h1>
+
+            <!-- This is the new Search Bar -->
+            <div class="search-container" style="margin-bottom: 2rem;">
+                <input type="text" id="searchInput" placeholder="Search your prompts by title or description..." style="width: 100%; box-sizing: border-box;">
+            </div>
+
             <div id="prompt-list">
-                </div>
+                <!-- Prompts will be loaded here by JavaScript -->
+            </div>
+            <p id="no-results-message" style="display: none; text-align: center; margin-top: 1rem;">No prompts found matching your search.</p>
+            
             <hr>
             <h2>Create New Prompt</h2>
             <form id="createPromptForm">
@@ -30,4 +39,3 @@
 
     <script src="dashboard.js"></script>
 </body>
-</html>

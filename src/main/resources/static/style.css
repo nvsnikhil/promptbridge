@@ -157,7 +157,7 @@ button {
     padding: 1rem;
     margin-top: 1rem;
     text-align: left;
-    position: relative; /* Needed for positioning the edit button */
+    position: relative;
 }
 pre {
     white-space: pre-wrap;
@@ -218,12 +218,33 @@ button.loading::after {
     white-space: pre-wrap;
 }
 
+.apply-suggestion-button {
+    background-image: linear-gradient(to right, #8e44ad, #9b59b6);
+    color: white;
+    margin-top: 0.75rem;
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+.apply-suggestion-button:hover {
+    background-image: linear-gradient(to right, #9b59b6, #8e44ad);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-1px);
+}
+
 /* --- Edit Version Styles --- */
 .edit-button {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background-color: #f39c12; /* A distinct orange color */
+    background-color: #f39c12;
     color: white;
     border: none;
     border-radius: 4px;
@@ -236,7 +257,7 @@ button.loading::after {
 }
 
 .prompt-version:hover .edit-button {
-    opacity: 1; /* Appears on hover */
+    opacity: 1;
 }
 
 .edit-button:hover {

@@ -20,7 +20,6 @@ class AddVersionRequest {
     public String content;
 }
 
-// DTO for the edit request
 class UpdateVersionRequest {
     public String content;
 }
@@ -31,7 +30,6 @@ public class PromptController {
 
     private final PromptService promptService;
 
-    // Using Constructor Injection (Best Practice)
     public PromptController(PromptService promptService) {
         this.promptService = promptService;
     }
@@ -40,42 +38,38 @@ public class PromptController {
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        Prompt newPrompt = promptService.createPrompt(
-            request.title,
-            request.description,
-            request.content,
-            currentUser.getId()
-        );
-        // Convert to DTO before returning
-        PromptDetailsDto dto = promptService.convertToDto(newPrompt);
-        return ResponseEntity.ok(dto);
+        Prompt newPrompt = promptService.createPrompt(request.title, request.description, request.content, currentUser.getId());
+        return ResponseEntity.ok(promptService.convertToDto(newPrompt));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PromptDetailsDto> getPromptById(@PathVariable Long id) {
         Prompt prompt = promptService.getPromptById(id);
-        PromptDetailsDto dto = promptService.convertToDto(prompt);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(promptService.convertToDto(prompt));
     }
     
     @GetMapping("/my-prompts")
     public ResponseEntity<List<PromptDetailsDto>> getMyPrompts(Authentication authentication) {
         String userEmail = authentication.getName();
         List<Prompt> prompts = promptService.getPromptsForUser(userEmail);
-        
-        List<PromptDetailsDto> promptDtos = prompts.stream()
-                .map(promptService::convertToDto) // Using method reference for cleaner code
-                .collect(Collectors.toList());
-            
+        List<PromptDetailsDto> promptDtos = prompts.stream().map(promptService::convertToDto).collect(Collectors.toList());
+        return ResponseEntity.ok(promptDtos);
+    }
+
+    // This is the new endpoint for searching prompts
+    @GetMapping("/search")
+    public ResponseEntity<List<PromptDetailsDto>> searchMyPrompts(@RequestParam("query") String query, Authentication authentication) {
+        String userEmail = authentication.getName();
+        User currentUser = promptService.getCurrentUser(userEmail);
+        List<Prompt> prompts = promptService.searchUserPrompts(currentUser, query);
+        List<PromptDetailsDto> promptDtos = prompts.stream().map(promptService::convertToDto).collect(Collectors.toList());
         return ResponseEntity.ok(promptDtos);
     }
 
     @PostMapping("/{promptId}/versions")
     public ResponseEntity<PromptDetailsDto> addVersion(@PathVariable Long promptId, @RequestBody AddVersionRequest request) {
         Prompt updatedPrompt = promptService.addVersionToPrompt(promptId, request.content);
-        // Convert to DTO before returning
-        PromptDetailsDto dto = promptService.convertToDto(updatedPrompt);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(promptService.convertToDto(updatedPrompt));
     }
 
     @DeleteMapping("/{id}")
@@ -86,7 +80,6 @@ public class PromptController {
         return ResponseEntity.noContent().build();
     }
 
-    // This is the new endpoint for editing a prompt version
     @PutMapping("/versions/{versionId}")
     public ResponseEntity<Void> updateVersion(
             @PathVariable Long versionId,
@@ -94,9 +87,7 @@ public class PromptController {
             Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        
         promptService.updatePromptVersion(versionId, request.content, currentUser);
-        
         return ResponseEntity.ok().build();
     }
 }

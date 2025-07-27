@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!response.ok) {
             return response.text().then(text => { throw new Error(text || 'An API error occurred.') });
         }
-        // Check if response is JSON before parsing
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             return response.json();
@@ -51,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `).join('');
 
+                    // This now includes BOTH the Edit and Enhance buttons
                     return `
                         <div class="prompt-version" id="version-container-${version.id}">
                             <button class="edit-button" data-version-id="${version.id}">Edit</button>
@@ -58,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="version-content">
                                 <pre>${escapeHtml(version.content)}</pre>
                             </div>
+                            <button class="enhance-button" data-version-id="${version.id}">Enhance with AI</button>
+                            <div class="ai-suggestion-container"></div>
                             <div class="feedback-section">
                                 <h5>Feedback</h5>
                                 ${feedbackHtml.length > 0 ? feedbackHtml : '<p>No feedback yet.</p>'}
@@ -91,9 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
+    // This single event listener now handles Edit, Cancel, Save, and Enhance clicks
     document.body.addEventListener('click', function(event) {
-        if (event.target && event.target.matches('.edit-button')) {
-            const versionId = event.target.dataset.versionId;
+        const target = event.target;
+
+        // --- Edit Button Logic ---
+        if (target && target.matches('.edit-button')) {
+            const versionId = target.dataset.versionId;
             const versionContainer = document.querySelector(`#version-container-${versionId}`);
             const contentDiv = versionContainer.querySelector('.version-content');
             const originalContent = contentDiv.querySelector('pre').textContent;
@@ -107,12 +113,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
 
-        if (event.target && event.target.matches('.cancel-edit-button')) {
+        // --- Cancel Edit Button Logic ---
+        if (target && target.matches('.cancel-edit-button')) {
             fetchAndRenderPrompt();
         }
 
-        if (event.target && event.target.matches('.save-edit-button')) {
-            const button = event.target;
+        // --- Save Edit Button Logic ---
+        if (target && target.matches('.save-edit-button')) {
+            const button = target;
             const versionId = button.dataset.versionId;
             const versionContainer = document.querySelector(`#version-container-${versionId}`);
             const newContent = versionContainer.querySelector('.edit-textarea').value;
@@ -130,31 +138,51 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ content: newContent })
             })
             .then(handleResponse)
-            .then(() => {
-                fetchAndRenderPrompt();
-            })
+            .then(() => fetchAndRenderPrompt())
             .catch(error => {
                 console.error('Error saving changes:', error);
                 alert(`Failed to save changes: ${error.message}`);
             })
-            .finally(() => {
-                button.classList.remove('loading');
-            });
+            .finally(() => button.classList.remove('loading'));
+        }
+
+        // --- Enhance with AI Button Logic ---
+        if (target && target.matches('.enhance-button')) {
+            const button = target;
+            const versionId = button.dataset.versionId;
+            const suggestionContainer = document.querySelector(`#version-container-${versionId} .ai-suggestion-container`);
+            
+            button.classList.add('loading');
+            suggestionContainer.innerHTML = '';
+
+            fetch(`/api/ai/enhance/${versionId}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(handleResponse)
+            .then(suggestion => {
+                suggestionContainer.innerHTML = `<div class="ai-suggestion">${suggestion.replace(/\\n/g, '<br>')}</div>`;
+            })
+            .catch(error => {
+                console.error('Error enhancing prompt:', error);
+                suggestionContainer.innerHTML = `<p style="color:red;">Error getting AI suggestion: ${error.message}</p>`;
+            })
+            .finally(() => button.classList.remove('loading'));
         }
     });
 
+    // --- Form Submission Logic (Feedback and Add Version) ---
     document.body.addEventListener('submit', function(event) {
-        if (event.target && event.target.matches('.feedback-form')) {
+        const form = event.target;
+        
+        if (form && form.matches('.feedback-form')) {
             event.preventDefault();
-            const form = event.target;
             const button = form.querySelector('button');
             button.classList.add('loading');
-
             const feedbackData = {
                 rating: form.querySelector('.rating').value,
                 comment: form.querySelector('.comment').value
             };
-
             fetch(`/feedback/${form.dataset.versionId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -162,25 +190,20 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(handleResponse)
             .then(() => fetchAndRenderPrompt())
-            .catch(error => {
-                console.error('Error submitting feedback:', error);
-                alert(`Failed to submit feedback: ${error.message}`);
-            })
+            .catch(error => console.error('Error submitting feedback:', error))
             .finally(() => button.classList.remove('loading'));
         }
         
-        if (event.target && event.target.id === 'addVersionForm') {
+        if (form && form.id === 'addVersionForm') {
             event.preventDefault();
             const button = addVersionForm.querySelector('button');
             button.classList.add('loading');
-            
             const newContent = document.getElementById('newVersionContent').value;
             if (!newContent.trim()) {
                 alert('New version content cannot be empty.');
                 button.classList.remove('loading');
                 return;
             }
-
             const versionData = { content: newContent };
             fetch(`/prompts/${promptId}/versions`, {
                 method: 'POST',
@@ -192,10 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('newVersionContent').value = '';
                 fetchAndRenderPrompt();
             })
-            .catch(error => {
-                console.error('Error adding version:', error);
-                alert(`Failed to add new version: ${error.message}`);
-            })
+            .catch(error => console.error('Error adding version:', error))
             .finally(() => button.classList.remove('loading'));
         }
     });

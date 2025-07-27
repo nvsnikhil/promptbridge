@@ -69,7 +69,6 @@ public class PromptService {
         PromptVersion newVersion = new PromptVersion();
         newVersion.setContent(newContent);
         
-        // Robust version numbering
         int nextVersion = prompt.getVersions().stream()
                 .mapToInt(PromptVersion::getVersionNumber)
                 .max().orElse(0) + 1;
@@ -84,7 +83,6 @@ public class PromptService {
         Prompt promptToDelete = promptRepository.findById(promptId)
                 .orElseThrow(() -> new EntityNotFoundException("Prompt not found with id: " + promptId));
 
-        // Security Check: Ensure the user owns the prompt
         if (!Objects.equals(promptToDelete.getUser().getId(), currentUser.getId())) {
             throw new AccessDeniedException("You do not have permission to delete this prompt.");
         }
@@ -97,13 +95,17 @@ public class PromptService {
         PromptVersion versionToUpdate = promptVersionRepository.findById(versionId)
                 .orElseThrow(() -> new EntityNotFoundException("Prompt version not found with id: " + versionId));
 
-        // Security Check: Ensure the user owns the parent prompt of this version
         if (!Objects.equals(versionToUpdate.getPrompt().getUser().getId(), currentUser.getId())) {
             throw new AccessDeniedException("You do not have permission to edit this prompt version.");
         }
 
         versionToUpdate.setContent(newContent);
         return promptVersionRepository.save(versionToUpdate);
+    }
+    
+    // This is the new method for searching prompts
+    public List<Prompt> searchUserPrompts(User user, String query) {
+        return promptRepository.searchUserPrompts(user, query);
     }
     
     public PromptDetailsDto convertToDto(Prompt prompt) {

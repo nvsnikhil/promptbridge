@@ -72,14 +72,4 @@ public class PromptController {
         PromptDetailsDto dto = promptService.convertToDto(updatedPrompt);
         return ResponseEntity.ok(dto);
     }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePrompt(@PathVariable Long id, Authentication authentication) {
-        String userEmail = authentication.getName();
-        User currentUser = promptService.getCurrentUser(userEmail);
-        
-        promptService.deletePrompt(id, currentUser);
-        
-        return ResponseEntity.noContent().build();
-    }
 }

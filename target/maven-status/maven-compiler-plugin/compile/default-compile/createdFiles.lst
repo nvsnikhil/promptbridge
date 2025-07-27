@@ -13,6 +13,7 @@ com/nikhil/promptbridge/controller/AuthController.class
 com/nikhil/promptbridge/controller/FeedbackController.class
 com/nikhil/promptbridge/config/SecurityConfig.class
 com/nikhil/promptbridge/service/FeedbackService.class
+com/nikhil/promptbridge/controller/UpdateVersionRequest.class
 com/nikhil/promptbridge/controller/LoginRequest.class
 com/nikhil/promptbridge/config/ApplicationConfig.class
 com/nikhil/promptbridge/repository/PromptVersionRepository.class

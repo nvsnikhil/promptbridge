@@ -157,6 +157,7 @@ button {
     padding: 1rem;
     margin-top: 1rem;
     text-align: left;
+    position: relative; /* Needed for positioning the edit button */
 }
 pre {
     white-space: pre-wrap;
@@ -215,4 +216,49 @@ button.loading::after {
     border: 1px solid #bce8f1;
     border-radius: 4px;
     white-space: pre-wrap;
+}
+
+/* --- Edit Version Styles --- */
+.edit-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #f39c12; /* A distinct orange color */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.prompt-version:hover .edit-button {
+    opacity: 1; /* Appears on hover */
+}
+
+.edit-button:hover {
+    background-color: #e67e22;
+}
+
+.edit-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.edit-controls button {
+    width: auto;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+}
+
+.edit-controls .cancel-button {
+    background-color: #95a5a6;
+}
+
+.edit-controls .cancel-button:hover {
+    background-color: #7f8c8d;
 }

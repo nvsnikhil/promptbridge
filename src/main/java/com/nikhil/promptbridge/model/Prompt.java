@@ -1,10 +1,12 @@
 package com.nikhil.promptbridge.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp; // Import for CreationTimestamp
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "prompts")
@@ -17,7 +19,7 @@ public class Prompt {
     private String title;
     private String description;
 
-    @CreationTimestamp // Automatically sets the timestamp when a new prompt is created
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -26,7 +28,16 @@ public class Prompt {
     private User user;
 
     @OneToMany(mappedBy = "prompt", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<PromptVersion> versions = new ArrayList<>(); // Initialized list
+    private List<PromptVersion> versions = new ArrayList<>();
+
+    // This is the new relationship for tags
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+        name = "prompt_tags",
+        joinColumns = @JoinColumn(name = "prompt_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     // --- Getters and Setters ---
     
@@ -42,4 +53,6 @@ public class Prompt {
     public void setUser(User user) { this.user = user; }
     public List<PromptVersion> getVersions() { return versions; }
     public void setVersions(List<PromptVersion> versions) { this.versions = versions; }
+    public Set<Tag> getTags() { return tags; }
+    public void setTags(Set<Tag> tags) { this.tags = tags; }
 }

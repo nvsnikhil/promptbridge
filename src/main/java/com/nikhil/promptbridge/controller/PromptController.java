@@ -8,12 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+// Updated to include a set of tag names
 class CreatePromptRequest {
     public String title;
     public String description;
     public String content;
+    public Set<String> tags; // New field for tags
 }
 
 class AddVersionRequest {
@@ -34,11 +37,18 @@ public class PromptController {
         this.promptService = promptService;
     }
 
+    // Updated to handle tags
     @PostMapping
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        Prompt newPrompt = promptService.createPrompt(request.title, request.description, request.content, currentUser.getId());
+        Prompt newPrompt = promptService.createPrompt(
+            request.title,
+            request.description,
+            request.content,
+            currentUser.getId(),
+            request.tags // Pass the new tags to the service
+        );
         return ResponseEntity.ok(promptService.convertToDto(newPrompt));
     }
 
@@ -56,7 +66,6 @@ public class PromptController {
         return ResponseEntity.ok(promptDtos);
     }
 
-    // This is the new endpoint for searching prompts
     @GetMapping("/search")
     public ResponseEntity<List<PromptDetailsDto>> searchMyPrompts(@RequestParam("query") String query, Authentication authentication) {
         String userEmail = authentication.getName();

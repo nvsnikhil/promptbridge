@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!response.ok) {
             return response.text().then(text => { throw new Error(text || 'An API error occurred.') });
         }
-        // For DELETE requests which have no content
         if (response.status === 204) {
             return Promise.resolve();
         }
@@ -56,6 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const promptElement = document.createElement('div');
                 promptElement.className = 'prompt-item';
                 
+                // This is the new logic to display tags
+                let tagsHtml = '';
+                if (prompt.tags && prompt.tags.length > 0) {
+                    tagsHtml = '<div class="tags-container">' + prompt.tags.map(tag => `<span class="tag">${escapeHtml(tag.name)}</span>`).join('') + '</div>';
+                }
+
                 const linkElement = document.createElement('a');
                 linkElement.href = `prompt-details.html?id=${prompt.id}`;
                 linkElement.style.textDecoration = 'none';
@@ -63,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 linkElement.innerHTML = `
                     <h3>${escapeHtml(prompt.title)}</h3>
                     <p>${escapeHtml(prompt.description)}</p>
+                    ${tagsHtml}
                     <small>Versions: ${prompt.versions.length}</small>
                 `;
                 
@@ -93,13 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- Debounced Search Input ---
     let searchTimeout;
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             fetchPrompts(this.value);
-        }, 300); // Wait 300ms after user stops typing
+        }, 300);
     });
 
     promptListDiv.addEventListener('click', function(event) {
@@ -126,10 +131,15 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         createPromptButton.classList.add('loading');
 
+        // This is the new logic to read the tags from the input field
+        const tagsInput = document.getElementById('promptTags').value;
+        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+
         const promptData = {
             title: document.getElementById('promptTitle').value,
             description: document.getElementById('promptDescription').value,
-            content: document.getElementById('promptContent').value
+            content: document.getElementById('promptContent').value,
+            tags: tags // Add the tags to the payload
         };
 
         fetch('/prompts', {
@@ -152,6 +162,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initial fetch when the page loads
     fetchPrompts();
 });

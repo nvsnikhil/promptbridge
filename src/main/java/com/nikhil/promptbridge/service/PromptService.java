@@ -6,6 +6,7 @@ import com.nikhil.promptbridge.dto.UserDto;
 import com.nikhil.promptbridge.dto.VersionDto;
 import com.nikhil.promptbridge.model.Prompt;
 import com.nikhil.promptbridge.model.PromptVersion;
+import com.nikhil.promptbridge.model.Tag;
 import com.nikhil.promptbridge.model.User;
 import com.nikhil.promptbridge.repository.PromptRepository;
 import com.nikhil.promptbridge.repository.PromptVersionRepository;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,26 +29,36 @@ public class PromptService {
     private final PromptRepository promptRepository;
     private final UserRepository userRepository;
     private final PromptVersionRepository promptVersionRepository;
+    private final TagService tagService; // Inject the new TagService
 
     @Autowired
-    public PromptService(PromptRepository promptRepository, UserRepository userRepository, PromptVersionRepository promptVersionRepository) {
+    public PromptService(PromptRepository promptRepository, UserRepository userRepository, PromptVersionRepository promptVersionRepository, TagService tagService) {
         this.promptRepository = promptRepository;
         this.userRepository = userRepository;
         this.promptVersionRepository = promptVersionRepository;
+        this.tagService = tagService; // Initialize in constructor
     }
 
+    // Updated to accept a set of tag names
     @Transactional
-    public Prompt createPrompt(String title, String description, String content, Long userId) {
+    public Prompt createPrompt(String title, String description, String content, Long userId, Set<String> tagNames) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        
+        // Find or create the tags
+        Set<Tag> tags = tagService.findOrCreateTags(tagNames);
+
         Prompt prompt = new Prompt();
         prompt.setTitle(title);
         prompt.setDescription(description);
         prompt.setUser(user);
+        prompt.setTags(tags); // Associate the tags with the new prompt
+
         PromptVersion firstVersion = new PromptVersion();
         firstVersion.setContent(content);
         firstVersion.setVersionNumber(1);
         firstVersion.setPrompt(prompt);
         prompt.getVersions().add(firstVersion);
+        
         return promptRepository.save(prompt);
     }
 
@@ -103,7 +115,6 @@ public class PromptService {
         return promptVersionRepository.save(versionToUpdate);
     }
     
-    // This is the new method for searching prompts
     public List<Prompt> searchUserPrompts(User user, String query) {
         return promptRepository.searchUserPrompts(user, query);
     }

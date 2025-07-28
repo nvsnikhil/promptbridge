@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptBridge - Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+    // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
 <body class="app-layout">
     <header class="main-header">
         <h2>PromptBridge</h2>
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider round"></span>
+        </label>
         <button id="logoutButton" class="logout-button">Logout</button>
     </header>
 
@@ -39,4 +49,22 @@
     </main>
 
     <script src="dashboard.js"></script>
+    <script>
+        const toggle = document.getElementById('darkModeToggle');
+        const root = document.documentElement;
+
+        // Set checkbox state based on theme
+        toggle.checked = root.classList.contains('dark');
+
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+            root.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            } else {
+            root.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+
 </body>

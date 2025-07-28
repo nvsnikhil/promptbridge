@@ -1,42 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="transition-colors duration-300">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromptBridge - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PromptBridge - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="app-layout">
-    <header class="main-header">
-        <h2>PromptBridge</h2>
-        <button id="logoutButton" class="logout-button">Logout</button>
-    </header>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
+  <header class="flex justify-between items-center p-4 bg-blue-600 dark:bg-blue-800 text-white">
+    <h2 class="text-xl font-semibold">PromptBridge</h2>
+    <div class="flex items-center gap-4">
+      <span id="userName" class="text-sm font-medium"></span>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="darkModeToggle" class="sr-only peer">
+        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+      </label>
+      <button id="logoutButton" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm">Logout</button>
+    </div>
+  </header>
 
-    <main>
-        <div class="container">
-            <h1>Your Prompts</h1>
+  <main class="flex-1 p-6">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold mb-4">Your Prompts</h1>
+      <input type="text" id="searchInput" placeholder="Search by title or description..." class="w-full mb-6 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
 
-            <div class="search-container" style="margin-bottom: 2rem;">
-                <input type="text" id="searchInput" placeholder="Search your prompts by title or description..." style="width: 100%; box-sizing: border-box;">
-            </div>
+      <div id="prompt-list" class="grid gap-4"></div>
+      <p id="no-results-message" class="text-center mt-4 hidden">No prompts found matching your search.</p>
 
-            <div id="prompt-list">
-                <!-- Prompts will be loaded here by JavaScript -->
-            </div>
-            <p id="no-results-message" style="display: none; text-align: center; margin-top: 1rem;">No prompts found matching your search.</p>
-            
-            <hr>
-            <h2>Create New Prompt</h2>
-            <form id="createPromptForm">
-                <input type="text" id="promptTitle" placeholder="Prompt Title" required>
-                <textarea id="promptDescription" placeholder="Description"></textarea>
-                <!-- This is the new input field for tags -->
-                <input type="text" id="promptTags" placeholder="Add tags, separated by commas (e.g., marketing, code, creative)">
-                <textarea id="promptContent" placeholder="Enter your prompt content here..." required></textarea>
-                <button type="submit">Create Prompt</button>
-            </form>
-        </div>
-    </main>
+      <hr class="my-8 border-gray-400 dark:border-gray-600" />
 
-    <script src="dashboard.js"></script>
+      <h2 class="text-xl font-semibold mb-2">Create New Prompt</h2>
+      <form id="createPromptForm" class="space-y-4">
+        <input type="text" id="promptTitle" placeholder="Prompt Title" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
+        <textarea id="promptDescription" placeholder="Description" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded"></textarea>
+        <input type="text" id="promptTags" placeholder="Tags (comma separated)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
+        <textarea id="promptContent" placeholder="Prompt content..." required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded"></textarea>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Prompt</button>
+      </form>
+    </div>
+  </main>
+
+  <script src="dashboard.js"></script>
 </body>
+</html>

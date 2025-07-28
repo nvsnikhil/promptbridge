@@ -1,43 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromptBridge - Login</title>
-     <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PromptBridge - Login</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Your existing global CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <div class="split-screen-container">
-        <div class="left-pane">
-            <h2>PromptBridge</h2>
-            <p>Version control for your AI conversations.</p>
-        </div>
-
-        <div class="right-pane">
-            <div id="login-form-container">
-                <h2>Login</h2>
-                <form id="loginForm">
-                    <input type="email" id="loginEmail" placeholder="Email" required>
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                </form>
-                <p>Don't have an account? <a href="#" id="show-register">Sign Up</a></p>
-            </div>
-
-            <div id="register-form-container" style="display:none;">
-                <h2>Create Account</h2>
-                <form id="registerForm">
-                    <input type="text" id="registerName" placeholder="Name" required>
-                    <input type="email" id="registerEmail" placeholder="Email" required>
-                    <input type="password" id="registerPassword" placeholder="Password" required>
-                    <button type="submit">Create Account</button>
-                </form>
-                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-            </div>
-            
-            <p id="message"></p>
-        </div>
+<body class="min-h-screen flex bg-gray-100">
+  <div class="flex flex-1">
+    <!-- Left pane -->
+    <div class="hidden md:flex flex-col justify-center items-center bg-gradient-to-r from-[#3498db] to-[#2980b9] text-white flex-1 p-10">
+      <h2 class="text-4xl font-bold mb-4">PromptBridge</h2>
+      <p class="text-lg max-w-xs text-center">Version control for your AI conversations.</p>
     </div>
-    <script src="app.js"></script>
+
+    <!-- Right pane -->
+    <div class="flex flex-1 flex-col justify-center items-center bg-white p-8">
+      <!-- Login form container -->
+      <div id="login-form-container" class="w-full max-w-md">
+        <h2 class="text-3xl font-semibold mb-6 text-[#333]">Login</h2>
+        <form id="loginForm" class="flex flex-col gap-4 mt-6">
+          <input
+            type="email"
+            id="loginEmail"
+            name="email"
+            placeholder="Email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#3498db] focus:ring-2 focus:ring-[#3498db]"
+          />
+          <input
+            type="password"
+            id="loginPassword"
+            name="password"
+            placeholder="Password"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#3498db] focus:ring-2 focus:ring-[#3498db]"
+          />
+          <button
+            type="submit"
+            class="w-full bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold py-3 rounded-md transition"
+          >
+            Login
+          </button>
+        </form>
+        <p class="mt-4 text-sm text-[#333]">
+          Don't have an account?
+          <a href="#" id="show-register" class="text-[#3498db] font-bold hover:underline">Sign Up</a>
+        </p>
+      </div>
+
+      <!-- Register form container (hidden by default) -->
+      <div id="register-form-container" class="w-full max-w-md hidden">
+        <h2 class="text-3xl font-semibold mb-6 text-[#333]">Create Account</h2>
+        <form id="registerForm" class="flex flex-col gap-4 mt-6">
+          <input
+            type="text"
+            id="registerName"
+            name="name"
+            placeholder="Name"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#3498db] focus:ring-2 focus:ring-[#3498db]"
+          />
+          <input
+            type="email"
+            id="registerEmail"
+            name="email"
+            placeholder="Email"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#3498db] focus:ring-2 focus:ring-[#3498db]"
+          />
+          <input
+            type="password"
+            id="registerPassword"
+            name="password"
+            placeholder="Password"
+            required
+            class="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-[#3498db] focus:ring-2 focus:ring-[#3498db]"
+          />
+          <button
+            type="submit"
+            class="w-full bg-[#3498db] hover:bg-[#2980b9] text-white font-semibold py-3 rounded-md transition"
+          >
+            Create Account
+          </button>
+        </form>
+        <p class="mt-4 text-sm text-[#333]">
+          Already have an account?
+          <a href="#" id="show-login" class="text-[#3498db] font-bold hover:underline">Login</a>
+        </p>
+      </div>
+
+      <p id="message" class="mt-6 text-center text-red-600"></p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

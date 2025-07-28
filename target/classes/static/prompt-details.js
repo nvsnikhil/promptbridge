@@ -204,13 +204,57 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.addEventListener('submit', function(event) {
         const form = event.target;
         
+        // --- Feedback form submission ---
         if (form && form.matches('.feedback-form')) {
             event.preventDefault();
-            // ... (feedback form logic is the same) ...
+            const button = form.querySelector('button[type="submit"]');
+            button.classList.add('loading');
+            const versionId = form.dataset.versionId;
+            const feedbackData = {
+                rating: form.querySelector('.rating').value,
+                comment: form.querySelector('.comment').value
+            };
+            fetch(`/feedback/${versionId}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(feedbackData)
+            })
+            .then(handleResponse)
+            .then(() => fetchAndRenderPrompt())
+            .catch(error => {
+                console.error('Error submitting feedback:', error);
+                alert(`Failed to submit feedback: ${error.message}`);
+            })
+            .finally(() => button.classList.remove('loading'));
         }
         
+        // --- Add version form submission ---
         if (form && form.id === 'addVersionForm') {
             event.preventDefault();
+            const button = addVersionForm.querySelector('button');
+            button.classList.add('loading');
+            const newContent = document.getElementById('newVersionContent').value;
+            if (!newContent.trim()) {
+                alert('New version content cannot be empty.');
+                button.classList.remove('loading');
+                return;
+            }
+            const versionData = { content: newContent };
+            fetch(`/prompts/${promptId}/versions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(versionData)
+            })
+            .then(handleResponse)
+            .then(() => {
+                document.getElementById('newVersionContent').value = '';
+                fetchAndRenderPrompt();
+            })
+            .catch(error => console.error('Error adding version:', error))
+            .finally(() => button.classList.remove('loading'));
         }
     });
 

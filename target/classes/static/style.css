@@ -283,3 +283,21 @@ button.loading::after {
 .edit-controls .cancel-button:hover {
     background-color: #7f8c8d;
 }
+
+/* --- Tagging Styles --- */
+.tags-container {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px; /* Pill shape */
+    font-size: 0.75rem;
+    font-weight: 500;
+}

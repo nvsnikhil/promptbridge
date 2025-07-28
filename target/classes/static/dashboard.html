@@ -6,7 +6,7 @@
     <title>PromptBridge - Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="app-layout">
     <header class="main-header">
         <h2>PromptBridge</h2>
         <button id="logoutButton" class="logout-button">Logout</button>
@@ -16,7 +16,6 @@
         <div class="container">
             <h1>Your Prompts</h1>
 
-            <!-- This is the new Search Bar -->
             <div class="search-container" style="margin-bottom: 2rem;">
                 <input type="text" id="searchInput" placeholder="Search your prompts by title or description..." style="width: 100%; box-sizing: border-box;">
             </div>
@@ -31,6 +30,8 @@
             <form id="createPromptForm">
                 <input type="text" id="promptTitle" placeholder="Prompt Title" required>
                 <textarea id="promptDescription" placeholder="Description"></textarea>
+                <!-- This is the new input field for tags -->
+                <input type="text" id="promptTags" placeholder="Add tags, separated by commas (e.g., marketing, code, creative)">
                 <textarea id="promptContent" placeholder="Enter your prompt content here..." required></textarea>
                 <button type="submit">Create Prompt</button>
             </form>

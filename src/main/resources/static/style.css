@@ -157,7 +157,7 @@ button {
     padding: 1rem;
     margin-top: 1rem;
     text-align: left;
-    position: relative;
+    position: relative; /* Needed for positioning buttons */
 }
 pre {
     white-space: pre-wrap;
@@ -167,6 +167,46 @@ pre {
     border-radius: 4px;
     text-align: left;
 }
+
+/* --- Version Controls (Edit & Copy) --- */
+.version-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease-in-out;
+}
+
+.prompt-version:hover .version-controls {
+    opacity: 1; /* Appears on hover */
+}
+
+.icon-button {
+    background-color: #bdc3c7; /* A neutral gray */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+    background-color: #95a5a6;
+}
+
+.edit-button {
+    background-color: #f39c12; /* Orange for edit */
+}
+
+.edit-button:hover {
+    background-color: #e67e22;
+}
+
 
 /* --- Loading Indicator Styles --- */
 button.loading {
@@ -239,31 +279,7 @@ button.loading::after {
     transform: translateY(-1px);
 }
 
-/* --- Edit Version Styles --- */
-.edit-button {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background-color: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.prompt-version:hover .edit-button {
-    opacity: 1;
-}
-
-.edit-button:hover {
-    background-color: #e67e22;
-}
-
+/* --- Edit Version Controls --- */
 .edit-controls {
     display: flex;
     gap: 0.5rem;
@@ -282,22 +298,4 @@ button.loading::after {
 
 .edit-controls .cancel-button:hover {
     background-color: #7f8c8d;
-}
-
-/* --- Tagging Styles --- */
-.tags-container {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.tag {
-    background-color: #e9ecef;
-    color: #495057;
-    padding: 0.25rem 0.6rem;
-    border-radius: 9999px; /* Pill shape */
-    font-size: 0.75rem;
-    font-weight: 500;
 }

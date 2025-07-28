@@ -12,14 +12,17 @@
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/model/Feedback.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/model/Prompt.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/model/PromptVersion.java
+/workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/model/Tag.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/model/User.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/repository/FeedbackRepository.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/repository/PromptRepository.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/repository/PromptVersionRepository.java
+/workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/repository/TagRepository.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/repository/UserRepository.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/AIController.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/AIService.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/FeedbackService.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/JwtService.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/PromptService.java
+/workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/TagService.java
 /workspaces/promptbridge/src/main/java/com/nikhil/promptbridge/service/UserService.java

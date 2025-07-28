@@ -1,166 +1,74 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('jwtToken');
-    const promptListDiv = document.getElementById('prompt-list');
-    const createPromptForm = document.getElementById('createPromptForm');
-    const createPromptButton = createPromptForm.querySelector('button');
-    const logoutButton = document.getElementById('logoutButton');
-    const searchInput = document.getElementById('searchInput');
-    const noResultsMessage = document.getElementById('no-results-message');
+document.addEventListener("DOMContentLoaded", function () {
+  const logoutButton = document.getElementById("logoutButton");
+  const promptList = document.getElementById("prompt-list");
+  const createPromptForm = document.getElementById("createPromptForm");
+  const searchInput = document.getElementById("searchInput");
+  const noResultsMessage = document.getElementById("no-results-message");
+  const themeToggle = document.getElementById("themeToggle");
+  const usernameDisplay = document.getElementById("usernameDisplay");
 
-    if (!token) {
-        window.location.href = 'index.html';
-        return;
+  themeToggle.addEventListener("change", () => {
+    document.documentElement.classList.toggle("dark");
+  });
+
+  const username = localStorage.getItem("username") || "User";
+  usernameDisplay.textContent = `Welcome, ${username}`;
+
+  let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+
+  function renderPrompts(filteredPrompts = prompts) {
+    promptList.innerHTML = "";
+    if (filteredPrompts.length === 0) {
+      noResultsMessage.classList.remove("hidden");
+      return;
     }
+    noResultsMessage.classList.add("hidden");
 
-    logoutButton.addEventListener('click', function() {
-        localStorage.removeItem('jwtToken');
-        window.location.href = 'index.html';
+    filteredPrompts.forEach((prompt, index) => {
+      const card = document.createElement("div");
+      card.className = "bg-white dark:bg-gray-800 p-4 rounded shadow";
+      card.innerHTML = `
+        <h3 class="text-xl font-semibold mb-1">${prompt.title}</h3>
+        <p class="mb-2">${prompt.description}</p>
+        <div class="flex flex-wrap gap-2 mb-2">
+          ${prompt.tags
+            .map(tag => `<span class="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-2 py-1 text-xs rounded">${tag.trim()}</span>`)
+            .join("")}
+        </div>
+        <pre class="bg-gray-100 dark:bg-gray-900 p-2 rounded overflow-x-auto"><code>${prompt.content}</code></pre>
+      `;
+      promptList.appendChild(card);
     });
+  }
 
-    // --- Helper function for handling API responses ---
-    function handleApiResponse(response) {
-        if (response.status === 403) { // Token expired or invalid
-            localStorage.removeItem('jwtToken');
-            window.location.href = 'index.html';
-            return Promise.reject(new Error('Session expired. Please log in again.'));
-        }
-        if (!response.ok) {
-            return response.text().then(text => { throw new Error(text || 'An API error occurred.') });
-        }
-        if (response.status === 204) {
-            return Promise.resolve();
-        }
-        return response.json();
-    }
-    
-    // --- Helper function to escape HTML ---
-    function escapeHtml(text) {
-        if (text === null || text === undefined) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
+  renderPrompts();
 
-    function renderPrompts(prompts) {
-        promptListDiv.innerHTML = '';
-        noResultsMessage.style.display = 'none';
+  createPromptForm.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-        if (prompts.length === 0) {
-            if (searchInput.value.trim() !== '') {
-                noResultsMessage.style.display = 'block';
-            } else {
-                promptListDiv.innerHTML = '<p>You have no prompts yet. Create one below!</p>';
-            }
-        } else {
-            prompts.forEach(prompt => {
-                const promptElement = document.createElement('div');
-                promptElement.className = 'prompt-item';
-                
-                // This is the new logic to display tags
-                let tagsHtml = '';
-                if (prompt.tags && prompt.tags.length > 0) {
-                    tagsHtml = '<div class="tags-container">' + prompt.tags.map(tag => `<span class="tag">${escapeHtml(tag.name)}</span>`).join('') + '</div>';
-                }
+    const title = document.getElementById("promptTitle").value;
+    const description = document.getElementById("promptDescription").value;
+    const tags = document.getElementById("promptTags").value.split(",");
+    const content = document.getElementById("promptContent").value;
 
-                const linkElement = document.createElement('a');
-                linkElement.href = `prompt-details.html?id=${prompt.id}`;
-                linkElement.style.textDecoration = 'none';
-                linkElement.style.color = 'inherit';
-                linkElement.innerHTML = `
-                    <h3>${escapeHtml(prompt.title)}</h3>
-                    <p>${escapeHtml(prompt.description)}</p>
-                    ${tagsHtml}
-                    <small>Versions: ${prompt.versions.length}</small>
-                `;
-                
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-button';
-                deleteButton.textContent = 'Delete';
-                deleteButton.dataset.promptId = prompt.id;
+    const newPrompt = { title, description, tags, content };
+    prompts.push(newPrompt);
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+    renderPrompts();
+    createPromptForm.reset();
+  });
 
-                promptElement.appendChild(linkElement);
-                promptElement.appendChild(deleteButton);
-                promptListDiv.appendChild(promptElement);
-            });
-        }
-    }
-    
-    function fetchPrompts(query = '') {
-        let url = query ? `/prompts/search?query=${encodeURIComponent(query)}` : '/prompts/my-prompts';
+  searchInput.addEventListener("input", function () {
+    const searchTerm = this.value.toLowerCase();
+    const filtered = prompts.filter(prompt =>
+      prompt.title.toLowerCase().includes(searchTerm) ||
+      prompt.description.toLowerCase().includes(searchTerm)
+    );
+    renderPrompts(filtered);
+  });
 
-        fetch(url, {
-            method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(handleApiResponse)
-        .then(renderPrompts)
-        .catch(error => {
-            console.error('Error fetching prompts:', error);
-            promptListDiv.innerHTML = `<p style="color:red;">Error loading prompts: ${error.message}</p>`;
-        });
-    }
-    
-    let searchTimeout;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            fetchPrompts(this.value);
-        }, 300);
-    });
-
-    promptListDiv.addEventListener('click', function(event) {
-        if (event.target && event.target.matches('.delete-button')) {
-            const promptId = event.target.dataset.promptId;
-            if (confirm('Are you sure you want to delete this prompt? This action cannot be undone.')) {
-                fetch(`/prompts/${promptId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                })
-                .then(handleApiResponse)
-                .then(() => {
-                    fetchPrompts(searchInput.value);
-                })
-                .catch(error => {
-                    console.error('Error deleting prompt:', error);
-                    alert(`Failed to delete prompt: ${error.message}`);
-                });
-            }
-        }
-    });
-
-    createPromptForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        createPromptButton.classList.add('loading');
-
-        // This is the new logic to read the tags from the input field
-        const tagsInput = document.getElementById('promptTags').value;
-        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
-
-        const promptData = {
-            title: document.getElementById('promptTitle').value,
-            description: document.getElementById('promptDescription').value,
-            content: document.getElementById('promptContent').value,
-            tags: tags // Add the tags to the payload
-        };
-
-        fetch('/prompts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify(promptData)
-        })
-        .then(handleApiResponse)
-        .then(() => {
-            createPromptForm.reset();
-            searchInput.value = '';
-            fetchPrompts();
-        })
-        .catch(error => {
-            console.error('Error creating prompt:', error);
-            alert(`Failed to create prompt: ${error.message}`);
-        })
-        .finally(() => {
-            createPromptButton.classList.remove('loading');
-        });
-    });
-
-    fetchPrompts();
+  logoutButton.addEventListener("click", function () {
+    localStorage.removeItem("username");
+    window.location.href = "login.html";
+  });
 });

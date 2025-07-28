@@ -1,104 +1,166 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const userNameSpan = document.getElementById("userName");
-  const logoutButton = document.getElementById("logoutButton");
-  const darkToggle = document.getElementById("darkModeToggle");
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('jwtToken');
+    const promptListDiv = document.getElementById('prompt-list');
+    const createPromptForm = document.getElementById('createPromptForm');
+    const createPromptButton = createPromptForm.querySelector('button');
+    const logoutButton = document.getElementById('logoutButton');
+    const searchInput = document.getElementById('searchInput');
+    const noResultsMessage = document.getElementById('no-results-message');
 
-  // Set user's name
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  if (storedUser?.displayName) {
-    userNameSpan.textContent = storedUser.displayName;
-  }
-
-  // Logout
-  logoutButton.addEventListener("click", () => {
-    localStorage.removeItem("user");
-    window.location.href = "index.html";
-  });
-
-  // Dark mode toggle
-  darkToggle.addEventListener("change", () => {
-    document.body.classList.toggle("bg-white");
-    document.body.classList.toggle("bg-gray-900");
-    document.body.classList.toggle("text-gray-900");
-    document.body.classList.toggle("text-white");
-  });
-
-  // Elements
-  const createPromptForm = document.getElementById("createPromptForm");
-  const promptList = document.getElementById("prompt-list");
-  const searchInput = document.getElementById("searchInput");
-  const noResultsMessage = document.getElementById("no-results-message");
-
-  // Prompt data store
-  let prompts = JSON.parse(localStorage.getItem("prompts")) || [];
-
-  // Render prompts
-  const renderPrompts = (data) => {
-    promptList.innerHTML = "";
-    if (data.length === 0) {
-      noResultsMessage.classList.remove("hidden");
-      return;
-    } else {
-      noResultsMessage.classList.add("hidden");
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
     }
 
-    data.forEach((prompt, index) => {
-      const promptCard = document.createElement("div");
-      promptCard.className = "bg-white border border-gray-300 rounded p-4 shadow";
-
-      const title = document.createElement("h3");
-      title.className = "text-lg font-semibold text-blue-600 mb-2";
-      title.textContent = prompt.title;
-
-      const description = document.createElement("p");
-      description.className = "text-sm text-gray-700 mb-2";
-      description.textContent = prompt.description;
-
-      const tags = document.createElement("p");
-      tags.className = "text-sm text-gray-500 italic mb-2";
-      tags.textContent = prompt.tags;
-
-      const content = document.createElement("pre");
-      content.className = "bg-gray-100 p-2 rounded overflow-x-auto text-sm";
-      content.textContent = prompt.content;
-
-      promptCard.appendChild(title);
-      promptCard.appendChild(description);
-      promptCard.appendChild(tags);
-      promptCard.appendChild(content);
-
-      promptList.appendChild(promptCard);
+    logoutButton.addEventListener('click', function() {
+        localStorage.removeItem('jwtToken');
+        window.location.href = 'index.html';
     });
-  };
 
-  // Initial render
-  renderPrompts(prompts);
+    // --- Helper function for handling API responses ---
+    function handleApiResponse(response) {
+        if (response.status === 403) { // Token expired or invalid
+            localStorage.removeItem('jwtToken');
+            window.location.href = 'index.html';
+            return Promise.reject(new Error('Session expired. Please log in again.'));
+        }
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text || 'An API error occurred.') });
+        }
+        if (response.status === 204) {
+            return Promise.resolve();
+        }
+        return response.json();
+    }
+    
+    // --- Helper function to escape HTML ---
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
 
-  // Search
-  searchInput.addEventListener("input", (e) => {
-    const keyword = e.target.value.toLowerCase();
-    const filtered = prompts.filter(
-      (p) =>
-        p.title.toLowerCase().includes(keyword) ||
-        p.description.toLowerCase().includes(keyword)
-    );
-    renderPrompts(filtered);
-  });
+    function renderPrompts(prompts) {
+        promptListDiv.innerHTML = '';
+        noResultsMessage.style.display = 'none';
 
-  // Create new prompt
-  createPromptForm.addEventListener("submit", (e) => {
-    e.preventDefault();
+        if (prompts.length === 0) {
+            if (searchInput.value.trim() !== '') {
+                noResultsMessage.style.display = 'block';
+            } else {
+                promptListDiv.innerHTML = '<p>You have no prompts yet. Create one below!</p>';
+            }
+        } else {
+            prompts.forEach(prompt => {
+                const promptElement = document.createElement('div');
+                promptElement.className = 'prompt-item';
+                
+                // This is the new logic to display tags
+                let tagsHtml = '';
+                if (prompt.tags && prompt.tags.length > 0) {
+                    tagsHtml = '<div class="tags-container">' + prompt.tags.map(tag => `<span class="tag">${escapeHtml(tag.name)}</span>`).join('') + '</div>';
+                }
 
-    const newPrompt = {
-      title: document.getElementById("promptTitle").value,
-      description: document.getElementById("promptDescription").value,
-      tags: document.getElementById("promptTags").value,
-      content: document.getElementById("promptContent").value,
-    };
+                const linkElement = document.createElement('a');
+                linkElement.href = `prompt-details.html?id=${prompt.id}`;
+                linkElement.style.textDecoration = 'none';
+                linkElement.style.color = 'inherit';
+                linkElement.innerHTML = `
+                    <h3>${escapeHtml(prompt.title)}</h3>
+                    <p>${escapeHtml(prompt.description)}</p>
+                    ${tagsHtml}
+                    <small>Versions: ${prompt.versions.length}</small>
+                `;
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.dataset.promptId = prompt.id;
 
-    prompts.unshift(newPrompt); // add to top
-    localStorage.setItem("prompts", JSON.stringify(prompts));
-    renderPrompts(prompts);
-    createPromptForm.reset();
-  });
+                promptElement.appendChild(linkElement);
+                promptElement.appendChild(deleteButton);
+                promptListDiv.appendChild(promptElement);
+            });
+        }
+    }
+    
+    function fetchPrompts(query = '') {
+        let url = query ? `/prompts/search?query=${encodeURIComponent(query)}` : '/prompts/my-prompts';
+
+        fetch(url, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(handleApiResponse)
+        .then(renderPrompts)
+        .catch(error => {
+            console.error('Error fetching prompts:', error);
+            promptListDiv.innerHTML = `<p style="color:red;">Error loading prompts: ${error.message}</p>`;
+        });
+    }
+    
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchPrompts(this.value);
+        }, 300);
+    });
+
+    promptListDiv.addEventListener('click', function(event) {
+        if (event.target && event.target.matches('.delete-button')) {
+            const promptId = event.target.dataset.promptId;
+            if (confirm('Are you sure you want to delete this prompt? This action cannot be undone.')) {
+                fetch(`/prompts/${promptId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(handleApiResponse)
+                .then(() => {
+                    fetchPrompts(searchInput.value);
+                })
+                .catch(error => {
+                    console.error('Error deleting prompt:', error);
+                    alert(`Failed to delete prompt: ${error.message}`);
+                });
+            }
+        }
+    });
+
+    createPromptForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        createPromptButton.classList.add('loading');
+
+        // This is the new logic to read the tags from the input field
+        const tagsInput = document.getElementById('promptTags').value;
+        const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
+
+        const promptData = {
+            title: document.getElementById('promptTitle').value,
+            description: document.getElementById('promptDescription').value,
+            content: document.getElementById('promptContent').value,
+            tags: tags // Add the tags to the payload
+        };
+
+        fetch('/prompts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(promptData)
+        })
+        .then(handleApiResponse)
+        .then(() => {
+            createPromptForm.reset();
+            searchInput.value = '';
+            fetchPrompts();
+        })
+        .catch(error => {
+            console.error('Error creating prompt:', error);
+            alert(`Failed to create prompt: ${error.message}`);
+        })
+        .finally(() => {
+            createPromptButton.classList.remove('loading');
+        });
+    });
+
+    fetchPrompts();
 });

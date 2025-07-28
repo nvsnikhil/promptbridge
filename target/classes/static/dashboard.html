@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="transition-colors duration-300">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,11 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col">
-  <header class="flex justify-between items-center p-4 bg-blue-600 dark:bg-blue-800 text-white">
-    <h2 class="text-xl font-semibold">PromptBridge</h2>
+<body class="bg-white text-gray-900 min-h-screen flex flex-col transition-colors duration-300" id="body">
+  <header class="main-header flex justify-between items-center px-6 py-4 bg-blue-600 text-white">
+    <h2 class="text-xl font-bold">PromptBridge</h2>
     <div class="flex items-center gap-4">
       <span id="userName" class="text-sm font-medium"></span>
+      <!-- Dark mode toggle -->
       <label class="relative inline-flex items-center cursor-pointer">
         <input type="checkbox" id="darkModeToggle" class="sr-only peer">
         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
@@ -20,22 +21,22 @@
     </div>
   </header>
 
-  <main class="flex-1 p-6">
+  <main class="flex-1 px-6 py-8">
     <div class="max-w-4xl mx-auto">
       <h1 class="text-2xl font-bold mb-4">Your Prompts</h1>
-      <input type="text" id="searchInput" placeholder="Search by title or description..." class="w-full mb-6 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
+      <input type="text" id="searchInput" placeholder="Search by title or description..." class="w-full mb-6 px-4 py-2 border border-gray-300 rounded" />
 
       <div id="prompt-list" class="grid gap-4"></div>
       <p id="no-results-message" class="text-center mt-4 hidden">No prompts found matching your search.</p>
 
-      <hr class="my-8 border-gray-400 dark:border-gray-600" />
+      <hr class="my-8 border-gray-300" />
 
       <h2 class="text-xl font-semibold mb-2">Create New Prompt</h2>
       <form id="createPromptForm" class="space-y-4">
-        <input type="text" id="promptTitle" placeholder="Prompt Title" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
-        <textarea id="promptDescription" placeholder="Description" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded"></textarea>
-        <input type="text" id="promptTags" placeholder="Tags (comma separated)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded" />
-        <textarea id="promptContent" placeholder="Prompt content..." required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded"></textarea>
+        <input type="text" id="promptTitle" placeholder="Prompt Title" required class="w-full px-4 py-2 border border-gray-300 rounded" />
+        <textarea id="promptDescription" placeholder="Description" class="w-full px-4 py-2 border border-gray-300 rounded"></textarea>
+        <input type="text" id="promptTags" placeholder="Tags (comma separated)" class="w-full px-4 py-2 border border-gray-300 rounded" />
+        <textarea id="promptContent" placeholder="Prompt content..." required class="w-full px-4 py-2 border border-gray-300 rounded"></textarea>
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Create Prompt</button>
       </form>
     </div>

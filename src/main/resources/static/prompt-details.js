@@ -211,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (form && form.id === 'addVersionForm') {
             event.preventDefault();
-            // ... (add version form logic is the same) ...
         }
     });
 

@@ -1,17 +1,12 @@
-# Use a lightweight OpenJDK image
-FROM eclipse-temurin:17-jdk-alpine
+# Use a lightweight OpenJDK 21 image
+FROM eclipse-temurin:21-jdk-alpine
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy project files
 COPY . .
 
-# Grant permission to mvnw script
 RUN chmod +x mvnw
 
-# Build the application
 RUN ./mvnw clean package -DskipTests
 
-# Run the app
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "target/promptbridge-0.0.1-SNAPSHOT.jar"]

@@ -8,14 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Set; // Import Set
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class CreatePromptRequest {
     public String title;
     public String description;
     public String content;
-    public Set<String> tags; // Add the tags field
+    public Set<String> tags;
 }
 
 class AddVersionRequest {
@@ -40,15 +40,19 @@ public class PromptController {
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        // Pass the tags to the service method
+        
         Prompt newPrompt = promptService.createPrompt(
             request.title,
             request.description,
             request.content,
             currentUser.getId(),
-            request.tags 
+            request.tags
         );
-        PromptDetailsDto dto = promptService.convertToDto(newPrompt);
+
+        // This is the fix: Re-fetch the prompt to ensure all data is loaded
+        Prompt savedPrompt = promptService.getPromptById(newPrompt.getId());
+        
+        PromptDetailsDto dto = promptService.convertToDto(savedPrompt);
         return ResponseEntity.ok(dto);
     }
 

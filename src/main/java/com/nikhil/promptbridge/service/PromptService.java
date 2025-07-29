@@ -65,28 +65,18 @@ public class PromptService {
         return promptRepository.save(prompt);
     }
 
-    /**
-     * Returns the entity Prompt by ID.
-     * This is added per your request (Option 2).
-     */
     @Transactional(readOnly = true)
     public Prompt getPromptById(Long promptId) {
         return promptRepository.findById(promptId)
                 .orElseThrow(() -> new EntityNotFoundException("Prompt not found with id: " + promptId));
     }
 
-    /**
-     * Returns DTO PromptDetailsDto by ID.
-     */
     @Transactional(readOnly = true)
     public PromptDetailsDto getPromptDtoById(Long promptId) {
         Prompt prompt = getPromptById(promptId);
         return convertToDto(prompt);
     }
 
-    /**
-     * Returns list of PromptDetailsDto for a user, eager loading versions, tags, and feedback.
-     */
     @Transactional(readOnly = true)
     public List<PromptDetailsDto> getPromptDtosForUser(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
@@ -159,7 +149,7 @@ public class PromptService {
         List<VersionDto> versionDtos = prompt.getVersions().stream()
                 .map(version -> {
                     List<FeedbackDto> feedbackDtos = Optional.ofNullable(version.getFeedback())
-                            .orElse(List.of())
+                            .orElse(Set.of()) // <-- Changed to Set.of() to match Set type
                             .stream()
                             .map(feedback -> new FeedbackDto(
                                     feedback.getRating(),

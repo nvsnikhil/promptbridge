@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 class CreatePromptRequest {
     public String title;
@@ -49,7 +48,7 @@ public class PromptController {
             request.tags
         );
 
-        // This is the fix: Re-fetch the prompt to ensure all data is loaded
+        // Re-fetch the prompt to ensure all data is loaded
         Prompt savedPrompt = promptService.getPromptById(newPrompt.getId());
         
         PromptDetailsDto dto = promptService.convertToDto(savedPrompt);
@@ -66,8 +65,8 @@ public class PromptController {
     @GetMapping("/my-prompts")
     public ResponseEntity<List<PromptDetailsDto>> getMyPrompts(Authentication authentication) {
         String userEmail = authentication.getName();
-        List<Prompt> prompts = promptService.getPromptsForUser(userEmail);
-        List<PromptDetailsDto> promptDtos = prompts.stream().map(promptService::convertToDto).collect(Collectors.toList());
+        // Updated to use DTO-returning method for eager loading and completeness
+        List<PromptDetailsDto> promptDtos = promptService.getPromptDtosForUser(userEmail);
         return ResponseEntity.ok(promptDtos);
     }
 

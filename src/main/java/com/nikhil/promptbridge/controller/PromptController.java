@@ -8,15 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-// Updated to include a set of tag names
 class CreatePromptRequest {
     public String title;
     public String description;
     public String content;
-    public Set<String> tags; // New field for tags
 }
 
 class AddVersionRequest {
@@ -37,7 +34,6 @@ public class PromptController {
         this.promptService = promptService;
     }
 
-    // Updated to handle tags
     @PostMapping
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
@@ -46,16 +42,18 @@ public class PromptController {
             request.title,
             request.description,
             request.content,
-            currentUser.getId(),
-            request.tags // Pass the new tags to the service
+            currentUser.getId()
         );
-        return ResponseEntity.ok(promptService.convertToDto(newPrompt));
+        // This is the fix: convert the entity to a DTO before returning
+        PromptDetailsDto dto = promptService.convertToDto(newPrompt);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PromptDetailsDto> getPromptById(@PathVariable Long id) {
         Prompt prompt = promptService.getPromptById(id);
-        return ResponseEntity.ok(promptService.convertToDto(prompt));
+        PromptDetailsDto dto = promptService.convertToDto(prompt);
+        return ResponseEntity.ok(dto);
     }
     
     @GetMapping("/my-prompts")
@@ -66,19 +64,11 @@ public class PromptController {
         return ResponseEntity.ok(promptDtos);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<PromptDetailsDto>> searchMyPrompts(@RequestParam("query") String query, Authentication authentication) {
-        String userEmail = authentication.getName();
-        User currentUser = promptService.getCurrentUser(userEmail);
-        List<Prompt> prompts = promptService.searchUserPrompts(currentUser, query);
-        List<PromptDetailsDto> promptDtos = prompts.stream().map(promptService::convertToDto).collect(Collectors.toList());
-        return ResponseEntity.ok(promptDtos);
-    }
-
     @PostMapping("/{promptId}/versions")
     public ResponseEntity<PromptDetailsDto> addVersion(@PathVariable Long promptId, @RequestBody AddVersionRequest request) {
         Prompt updatedPrompt = promptService.addVersionToPrompt(promptId, request.content);
-        return ResponseEntity.ok(promptService.convertToDto(updatedPrompt));
+        PromptDetailsDto dto = promptService.convertToDto(updatedPrompt);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")

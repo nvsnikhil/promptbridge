@@ -1,16 +1,15 @@
 name: Docker Login Test
-on: [push]
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  docker-login:
+  test-login:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug secret presence
-        run: |
-          echo "Username: ${{ secrets.DOCKERHUB_USERNAME }}"
-          echo "Token exists: ${{ secrets.DOCKERHUB_TOKEN != '' && 'yes' || 'no' }}"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

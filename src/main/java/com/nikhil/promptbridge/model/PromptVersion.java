@@ -14,7 +14,7 @@ public class PromptVersion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob 
+    // By removing @Lob, we fix the compatibility issue with PostgreSQL
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -22,7 +22,7 @@ public class PromptVersion {
     private int versionNumber;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", up-datable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,7 +30,7 @@ public class PromptVersion {
     private Prompt prompt;
     
     @OneToMany(mappedBy = "promptVersion", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Feedback> feedback = new ArrayList<>(); // Initialized list
+    private List<Feedback> feedback = new ArrayList<>();
 
     // --- Getters and Setters ---
     

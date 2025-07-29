@@ -1,6 +1,5 @@
 package com.nikhil.promptbridge.controller;
 
-import com.nikhil.promptbridge.model.User;
 import com.nikhil.promptbridge.service.JwtService;
 import com.nikhil.promptbridge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

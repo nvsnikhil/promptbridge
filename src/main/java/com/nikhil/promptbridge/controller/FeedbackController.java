@@ -1,6 +1,5 @@
 package com.nikhil.promptbridge.controller;
 
-import com.nikhil.promptbridge.model.Feedback;
 import com.nikhil.promptbridge.model.User;
 import com.nikhil.promptbridge.service.FeedbackService;
 import com.nikhil.promptbridge.service.PromptService;

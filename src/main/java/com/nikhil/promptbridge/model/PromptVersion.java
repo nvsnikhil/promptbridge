@@ -22,7 +22,7 @@ public class PromptVersion {
     private int versionNumber;
 
     @CreationTimestamp
-    @Column(name = "created_at", up-datable = false)
+    @Column(name = "created_at", updatable = false) // Corrected typo here
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

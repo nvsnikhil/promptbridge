@@ -8,12 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Set; // Import Set
 import java.util.stream.Collectors;
 
 class CreatePromptRequest {
     public String title;
     public String description;
     public String content;
+    public Set<String> tags; // Add the tags field
 }
 
 class AddVersionRequest {
@@ -38,13 +40,14 @@ public class PromptController {
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
+        // Pass the tags to the service method
         Prompt newPrompt = promptService.createPrompt(
             request.title,
             request.description,
             request.content,
-            currentUser.getId()
+            currentUser.getId(),
+            request.tags 
         );
-        // This is the fix: convert the entity to a DTO before returning
         PromptDetailsDto dto = promptService.convertToDto(newPrompt);
         return ResponseEntity.ok(dto);
     }

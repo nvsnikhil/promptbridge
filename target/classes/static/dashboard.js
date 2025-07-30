@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const promptData = {
             title: document.getElementById('promptTitle').value,
             description: document.getElementById('promptDescription').value,
-            content: document.getElementById('promptContent').value,
+            prompt: document.getElementById('promptContent').value,
             tags: tags // Add the tags to the payload
         };
 

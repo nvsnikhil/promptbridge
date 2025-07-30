@@ -5,17 +5,14 @@ com/nikhil/promptbridge/dto/UserDto.class
 com/nikhil/promptbridge/repository/PromptRepository.class
 com/nikhil/promptbridge/controller/PromptController.class
 com/nikhil/promptbridge/dto/VersionDto.class
-com/nikhil/promptbridge/controller/CreatePromptRequest.class
 com/nikhil/promptbridge/model/User.class
 com/nikhil/promptbridge/service/PromptService.class
-com/nikhil/promptbridge/controller/AddVersionRequest.class
 com/nikhil/promptbridge/controller/FeedbackRequest.class
 com/nikhil/promptbridge/repository/UserRepository.class
 com/nikhil/promptbridge/controller/AuthController.class
 com/nikhil/promptbridge/controller/FeedbackController.class
 com/nikhil/promptbridge/config/SecurityConfig.class
 com/nikhil/promptbridge/service/FeedbackService.class
-com/nikhil/promptbridge/controller/UpdateVersionRequest.class
 com/nikhil/promptbridge/controller/LoginRequest.class
 com/nikhil/promptbridge/config/ApplicationConfig.class
 com/nikhil/promptbridge/repository/PromptVersionRepository.class

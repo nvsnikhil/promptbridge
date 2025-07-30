@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PromptBridge - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body class="app-layout">
     <header class="main-header">
@@ -17,22 +17,45 @@
             <h1>Your Prompts</h1>
 
             <div class="search-container" style="margin-bottom: 2rem;">
-                <input type="text" id="searchInput" placeholder="Search your prompts by title or description..." style="width: 100%; box-sizing: border-box;">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search your prompts by title or description..."
+                    style="width: 100%; box-sizing: border-box;"
+                />
             </div>
 
             <div id="prompt-list">
                 <!-- Prompts will be loaded here by JavaScript -->
             </div>
-            <p id="no-results-message" style="display: none; text-align: center; margin-top: 1rem;">No prompts found matching your search.</p>
-            
-            <hr>
+            <p
+                id="no-results-message"
+                style="display: none; text-align: center; margin-top: 1rem;"
+            >
+                No prompts found matching your search.
+            </p>
+
+            <hr />
             <h2>Create New Prompt</h2>
             <form id="createPromptForm">
-                <input type="text" id="promptTitle" placeholder="Prompt Title" required>
+                <input
+                    type="text"
+                    id="promptTitle"
+                    placeholder="Prompt Title"
+                    required
+                />
                 <textarea id="promptDescription" placeholder="Description"></textarea>
-                <!-- This is the new input field for tags -->
-                <input type="text" id="promptTags" placeholder="Add tags, separated by commas (e.g., marketing, code, creative)">
-                <textarea id="promptContent" placeholder="Enter your prompt content here..." required></textarea>
+                <!-- New input field for tags -->
+                <input
+                    type="text"
+                    id="promptTags"
+                    placeholder="Add tags, separated by commas (e.g., marketing, code, creative)"
+                />
+                <textarea
+                    id="promptContent"
+                    placeholder="Enter your prompt content here..."
+                    required
+                ></textarea>
                 <button type="submit">Create Prompt</button>
             </form>
         </div>
@@ -40,3 +63,4 @@
 
     <script src="dashboard.js"></script>
 </body>
+</html>

@@ -207,7 +207,6 @@ pre {
     background-color: #e67e22;
 }
 
-
 /* --- Loading Indicator Styles --- */
 button.loading {
     position: relative;
@@ -300,4 +299,19 @@ button.loading::after {
     background-color: #7f8c8d;
 }
 
+/* --- Added Tag Styling for Prompt Tags --- */
+.tags-container {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
 
+.tag {
+    background-color: #3498db;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    user-select: none;
+}

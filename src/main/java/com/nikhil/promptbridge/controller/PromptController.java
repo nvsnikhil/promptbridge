@@ -1,29 +1,14 @@
 package com.nikhil.promptbridge.controller;
 
 import com.nikhil.promptbridge.dto.PromptDetailsDto;
-import com.nikhil.promptbridge.model.Prompt;
 import com.nikhil.promptbridge.model.User;
 import com.nikhil.promptbridge.service.PromptService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Set;
-
-class CreatePromptRequest {
-    public String title;
-    public String description;
-    public String content;
-    public Set<String> tags;
-}
-
-class AddVersionRequest {
-    public String content;
-}
-
-class UpdateVersionRequest {
-    public String content;
-}
 
 @RestController
 @RequestMapping("/prompts")
@@ -35,47 +20,78 @@ public class PromptController {
         this.promptService = promptService;
     }
 
+    // *** 1. Correctly placed /search endpoint, ABOVE /{id} mapping ***
+
+    @GetMapping("/search")
+    public ResponseEntity<List<PromptDetailsDto>> searchPrompts(
+            @RequestParam(value = "query") String query,
+            Authentication authentication) {
+
+        String userEmail = authentication.getName();
+        User currentUser = promptService.getCurrentUser(userEmail);
+
+        // Perform search
+        List<com.nikhil.promptbridge.model.Prompt> prompts = promptService.searchUserPrompts(currentUser, query);
+
+        // Convert entities to DTOs
+        List<PromptDetailsDto> dtos = prompts.stream()
+                .map(promptService::convertToDto)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
+
+    // *** 2. Create prompt endpoint ***
+
     @PostMapping
     public ResponseEntity<PromptDetailsDto> createPrompt(@RequestBody CreatePromptRequest request, Authentication authentication) {
         String userEmail = authentication.getName();
         User currentUser = promptService.getCurrentUser(userEmail);
-        
-        Prompt newPrompt = promptService.createPrompt(
-            request.title,
-            request.description,
-            request.content,
-            currentUser.getId(),
-            request.tags
+
+        // Null-safe tags handling
+        Set<String> tags = request.tags != null ? request.tags : Set.of();
+
+        // Create prompt
+        var newPrompt = promptService.createPrompt(
+                request.title,
+                request.description,
+                request.content,
+                currentUser.getId(),
+                tags
         );
 
-        // Re-fetch the prompt to ensure all data is loaded
-        Prompt savedPrompt = promptService.getPromptById(newPrompt.getId());
-        
-        PromptDetailsDto dto = promptService.convertToDto(savedPrompt);
+        // Fetch full DTO after save
+        PromptDetailsDto dto = promptService.getPromptDtoById(newPrompt.getId());
         return ResponseEntity.ok(dto);
     }
+
+    // *** 3. Get prompt by ID ***
 
     @GetMapping("/{id}")
     public ResponseEntity<PromptDetailsDto> getPromptById(@PathVariable Long id) {
-        Prompt prompt = promptService.getPromptById(id);
-        PromptDetailsDto dto = promptService.convertToDto(prompt);
+        PromptDetailsDto dto = promptService.getPromptDtoById(id);
         return ResponseEntity.ok(dto);
     }
-    
+
+    // *** 4. Get current user's prompts ***
+
     @GetMapping("/my-prompts")
     public ResponseEntity<List<PromptDetailsDto>> getMyPrompts(Authentication authentication) {
         String userEmail = authentication.getName();
-        // Updated to use DTO-returning method for eager loading and completeness
-        List<PromptDetailsDto> promptDtos = promptService.getPromptDtosForUser(userEmail);
-        return ResponseEntity.ok(promptDtos);
+        List<PromptDetailsDto> dtos = promptService.getPromptDtosForUser(userEmail);
+        return ResponseEntity.ok(dtos);
     }
+
+    // *** 5. Add version to prompt ***
 
     @PostMapping("/{promptId}/versions")
     public ResponseEntity<PromptDetailsDto> addVersion(@PathVariable Long promptId, @RequestBody AddVersionRequest request) {
-        Prompt updatedPrompt = promptService.addVersionToPrompt(promptId, request.content);
-        PromptDetailsDto dto = promptService.convertToDto(updatedPrompt);
+        var updatedPrompt = promptService.addVersionToPrompt(promptId, request.content);
+        PromptDetailsDto dto = promptService.getPromptDtoById(updatedPrompt.getId());
         return ResponseEntity.ok(dto);
     }
+
+    // *** 6. Delete prompt ***
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePrompt(@PathVariable Long id, Authentication authentication) {
@@ -84,6 +100,8 @@ public class PromptController {
         promptService.deletePrompt(id, currentUser);
         return ResponseEntity.noContent().build();
     }
+
+    // *** 7. Update prompt version ***
 
     @PutMapping("/versions/{versionId}")
     public ResponseEntity<Void> updateVersion(
@@ -94,5 +112,22 @@ public class PromptController {
         User currentUser = promptService.getCurrentUser(userEmail);
         promptService.updatePromptVersion(versionId, request.content, currentUser);
         return ResponseEntity.ok().build();
+    }
+
+    // --- Request DTO classes ---
+
+    static class CreatePromptRequest {
+        public String title;
+        public String description;
+        public String content;
+        public Set<String> tags;
+    }
+
+    static class AddVersionRequest {
+        public String content;
+    }
+
+    static class UpdateVersionRequest {
+        public String content;
     }
 }

@@ -142,7 +142,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tags: tags // Add the tags to the payload
         };
 
-        console.log("Sending Prompt Details:", { title, description, tags, prompt });
+        console.log("Sending Prompt Details:", promptData);
+
 
 
         fetch('/prompts', {

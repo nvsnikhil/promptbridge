@@ -96,7 +96,18 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(data => {
             console.log('Prompt created:', data);
-            fetchPrompts();
+            // Ensure allPrompts is updated properly after prompt creation
+            fetch('/api/prompts', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(freshData => {
+                window.allPrompts = freshData;
+                renderPrompts(freshData);
+            });
+
             document.getElementById('createPromptForm').reset();
         })
         .catch(error => {

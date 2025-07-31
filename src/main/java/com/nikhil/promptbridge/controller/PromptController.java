@@ -49,10 +49,27 @@ public class PromptController {
             request.tags
         );
 
-        // Use the new method to get a fully loaded prompt
         Prompt savedPrompt = promptService.getPromptByIdWithDetails(newPrompt.getId());
         
+        // --- DETAILED LOGGING FOR DEBUGGING ---
+        System.out.println("--- DEBUGGING CREATED PROMPT ---");
+        System.out.println("Saved Prompt ID: " + savedPrompt.getId());
+        System.out.println("Saved Prompt Title: " + savedPrompt.getTitle());
+        System.out.println("Saved Prompt Description: " + savedPrompt.getDescription());
+        System.out.println("Saved Prompt Tags: " + savedPrompt.getTags().stream().map(t -> t.getName()).collect(Collectors.joining(", ")));
+        System.out.println("Saved Prompt Versions Count: " + savedPrompt.getVersions().size());
+        System.out.println("---------------------------------");
+        
         PromptDetailsDto dto = promptService.convertToDto(savedPrompt);
+        
+        // --- DETAILED LOGGING FOR DTO ---
+        System.out.println("--- DEBUGGING DTO ---");
+        System.out.println("DTO Title: " + dto.title());
+        System.out.println("DTO Description: " + dto.description());
+        System.out.println("DTO Tags Count: " + dto.tags().size());
+        System.out.println("DTO Versions Count: " + dto.versions().size());
+        System.out.println("----------------------");
+
         return ResponseEntity.ok(dto);
     }
     
@@ -85,7 +102,7 @@ public class PromptController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PromptDetailsDto> getPromptById(@PathVariable Long id) {
-        Prompt prompt = promptService.getPromptByIdWithDetails(id); // Use the new method
+        Prompt prompt = promptService.getPromptByIdWithDetails(id);
         PromptDetailsDto dto = promptService.convertToDto(prompt);
         return ResponseEntity.ok(dto);
     }
@@ -93,10 +110,7 @@ public class PromptController {
     @PostMapping("/{promptId}/versions")
     public ResponseEntity<PromptDetailsDto> addVersion(@PathVariable Long promptId, @RequestBody AddVersionRequest request) {
         Prompt updatedPrompt = promptService.addVersionToPrompt(promptId, request.content);
-        
-        // Re-fetch for consistency
         Prompt savedPrompt = promptService.getPromptByIdWithDetails(updatedPrompt.getId());
-
         PromptDetailsDto dto = promptService.convertToDto(savedPrompt);
         return ResponseEntity.ok(dto);
     }

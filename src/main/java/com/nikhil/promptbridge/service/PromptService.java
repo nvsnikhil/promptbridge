@@ -13,7 +13,7 @@ import com.nikhil.promptbridge.repository.PromptRepository;
 import com.nikhil.promptbridge.repository.PromptVersionRepository;
 import com.nikhil.promptbridge.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.Hibernate; // Import Hibernate
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -58,12 +58,10 @@ public class PromptService {
         return promptRepository.save(prompt);
     }
 
-    // This is the new, robust method for getting a fully loaded prompt
     @Transactional(readOnly = true)
     public Prompt getPromptByIdWithDetails(Long promptId) {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new EntityNotFoundException("Prompt not found with id: " + promptId));
-        // Explicitly initialize the lazy-loaded collections
         Hibernate.initialize(prompt.getTags());
         Hibernate.initialize(prompt.getVersions());
         for (PromptVersion version : prompt.getVersions()) {
@@ -76,7 +74,6 @@ public class PromptService {
     public List<Prompt> getPromptsForUser(String userEmail) {
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userEmail));
         List<Prompt> prompts = promptRepository.findByUser(user);
-        // Eagerly load the necessary collections for the entire list
         prompts.forEach(p -> {
             Hibernate.initialize(p.getTags());
             Hibernate.initialize(p.getVersions());
@@ -90,7 +87,7 @@ public class PromptService {
 
     @Transactional
     public Prompt addVersionToPrompt(Long promptId, String newContent) {
-        Prompt prompt = getPromptByIdWithDetails(promptId); // Use the new method
+        Prompt prompt = getPromptByIdWithDetails(promptId);
         PromptVersion newVersion = new PromptVersion();
         newVersion.setContent(newContent);
         int nextVersion = prompt.getVersions().stream().mapToInt(PromptVersion::getVersionNumber).max().orElse(0) + 1;
@@ -102,7 +99,7 @@ public class PromptService {
 
     @Transactional
     public void deletePrompt(Long promptId, User currentUser) {
-        Prompt promptToDelete = getPromptByIdWithDetails(promptId); // Use the new method
+        Prompt promptToDelete = getPromptByIdWithDetails(promptId);
         if (!Objects.equals(promptToDelete.getUser().getId(), currentUser.getId())) {
             throw new AccessDeniedException("You do not have permission to delete this prompt.");
         }
@@ -123,7 +120,6 @@ public class PromptService {
     @Transactional(readOnly = true)
     public List<Prompt> searchUserPrompts(User user, String query) {
         List<Prompt> prompts = promptRepository.searchUserPrompts(user, query);
-        // Eagerly load the necessary collections
         prompts.forEach(p -> {
             Hibernate.initialize(p.getTags());
             Hibernate.initialize(p.getVersions());
@@ -135,7 +131,7 @@ public class PromptService {
         List<VersionDto> versionDtos = prompt.getVersions().stream()
             .map(version -> {
                 List<FeedbackDto> feedbackDtos = Optional.ofNullable(version.getFeedback())
-                    .orElse(List.of())
+                    .orElse(Set.of()) // <-- THIS IS THE FIX
                     .stream()
                     .map(feedback -> new FeedbackDto(
                         feedback.getRating(),
